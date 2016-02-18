@@ -1,0 +1,26 @@
+# Put general configuration in this file
+
+org.seedstack.jdbc.datasources = datasource
+org.seedstack.jpa.units = ouist-jpa-unit
+
+[org.seedstack.jdbc.datasource.datasource]
+provider = HikariDataSourceProvider
+driver = org.hsqldb.jdbcDriver
+url = jdbc:hsqldb:mem:testdb1
+user = sa
+password =
+
+[org.seedstack.seed.core]
+application-id = ouist
+
+[org.seedstack.jpa.unit.ouist-jpa-unit]
+datasource = datasource
+property.hibernate.hbm2ddl.auto = create
+property.hibernate.dialect = org.hibernate.dialect.HSQLDialect
+#property.hibernate.show_sql = true
+
+[org.ydautremay.ouist.domain.*]
+jpa-unit = ouist-jpa-unit
+
+[org.ydautremay.ouist.domain.model.game.Game]
+identity.handler-qualifier = simple-UUID

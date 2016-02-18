@@ -1,0 +1,9 @@
+[org.seedstack.seed.shell]
+enabled = true
+key.type = generated
+
+[org.seedstack.seed.cli]
+default-command = dummy
+
+[org.seedstack.seed.security.users]
+yves = pass
