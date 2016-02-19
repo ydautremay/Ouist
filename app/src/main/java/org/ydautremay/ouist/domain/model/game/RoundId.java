@@ -33,4 +33,12 @@ public class RoundId extends BaseValueObject {
     public int getRoundNb() {
         return roundNb;
     }
+
+    private void setGameId(UUID gameId) {
+        this.gameId = gameId;
+    }
+
+    private void setRoundNb(int roundNb) {
+        this.roundNb = roundNb;
+    }
 }

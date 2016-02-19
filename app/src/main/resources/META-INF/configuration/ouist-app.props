@@ -1,5 +1,4 @@
 # Put general configuration in this file
-
 org.seedstack.jdbc.datasources = datasource
 org.seedstack.jpa.units = ouist-jpa-unit
 
@@ -17,10 +16,13 @@ application-id = ouist
 datasource = datasource
 property.hibernate.hbm2ddl.auto = create
 property.hibernate.dialect = org.hibernate.dialect.HSQLDialect
-#property.hibernate.show_sql = true
+property.hibernate.show_sql = true
 
 [org.ydautremay.ouist.domain.*]
 jpa-unit = ouist-jpa-unit
 
 [org.ydautremay.ouist.domain.model.game.Game]
+identity.handler-qualifier = simple-UUID
+
+[org.ydautremay.ouist.domain.model.scoresheet.ScoreSheet]
 identity.handler-qualifier = simple-UUID

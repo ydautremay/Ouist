@@ -3,32 +3,31 @@ package org.ydautremay.ouist.domain.model.game;
 import javax.persistence.Embeddable;
 
 import org.seedstack.business.domain.BaseValueObject;
-
 import org.ydautremay.ouist.domain.model.player.PlayerNickName;
 
 /**
- * Created by dautremayy on 08/02/2016.
+ * Created by dautremayy on 19/02/2016.
  */
 @Embeddable
-public class ContractId extends BaseValueObject {
+public class SimpleTrick extends BaseValueObject {
 
     private RoundId roundId;
 
-    private PlayerNickName player;
+    private PlayerNickName leader;
 
-    ContractId(){
+    SimpleTrick() {
     }
 
-    public ContractId(RoundId roundId, PlayerNickName player) {
+    public SimpleTrick(RoundId roundId, PlayerNickName playerNickName) {
         this.roundId = roundId;
-        this.player = player;
+        this.leader = playerNickName;
     }
 
     public RoundId getRoundId() {
         return roundId;
     }
 
-    public PlayerNickName getPlayer() {
-        return player;
+    public PlayerNickName getLeader() {
+        return leader;
     }
 }

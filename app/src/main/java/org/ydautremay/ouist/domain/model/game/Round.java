@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -13,7 +14,6 @@ import javax.persistence.OrderColumn;
 import javax.persistence.Transient;
 
 import org.seedstack.business.domain.BaseEntity;
-
 import org.ydautremay.ouist.domain.model.Deal;
 
 /**
@@ -28,12 +28,12 @@ public class Round extends BaseEntity<RoundId> {
     @Transient
     private Deal deal;
 
-    @OneToMany(mappedBy = "contractId.roundId", cascade= CascadeType.ALL)
-    @OrderColumn(name = "contractNb")
-    private List<Contract> contracts;
+    @ElementCollection
+    @OrderColumn(name = "trickNb")
+    private List<SimpleTrick> playedTricks;
 
-    @Transient
-    private Collection<Score> scores;
+    @OneToMany(mappedBy = "contractId.roundId", cascade = CascadeType.ALL)
+    private Collection<Contract> contracts;
 
     Round() {
     }
@@ -41,20 +41,17 @@ public class Round extends BaseEntity<RoundId> {
     Round(RoundId roundId) {
         this.roundId = roundId;
         this.contracts = new ArrayList<>();
-        this.scores = new ArrayList<Score>();
+        this.playedTricks = new ArrayList<>();
     }
 
     Round(UUID gameId, int roundNb) {
         this(new RoundId(gameId, roundNb));
     }
 
-    public List<Contract> getContracts() {
+    public Collection<Contract> getContracts() {
         return contracts;
     }
 
-    public Collection<Score> getScores() {
-        return scores;
-    }
 
     public Deal getDeal() {
         return deal;
@@ -62,6 +59,10 @@ public class Round extends BaseEntity<RoundId> {
 
     public RoundId getRoundId() {
         return roundId;
+    }
+
+    public List<SimpleTrick> getPlayedTricks() {
+        return playedTricks;
     }
 
     @Override

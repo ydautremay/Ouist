@@ -1,7 +1,5 @@
 package org.ydautremay.ouist.domain.model.game;
 
-import java.util.Date;
-
 import javax.inject.Inject;
 
 import org.seedstack.business.domain.BaseFactory;
@@ -17,7 +15,7 @@ public class GameFactoryDefault extends BaseFactory<Game> implements GameFactory
 
     @Override
     public Game createGame() {
-        Game game = new Game(new Date());
+        Game game = new Game();
         identityService.identify(game);
         return game;
     }

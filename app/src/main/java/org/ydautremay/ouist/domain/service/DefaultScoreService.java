@@ -7,11 +7,11 @@ import javax.inject.Inject;
 
 import org.ydautremay.ouist.domain.model.Deal;
 import org.ydautremay.ouist.domain.model.Trick;
-import org.ydautremay.ouist.domain.model.game.Round;
-import org.ydautremay.ouist.domain.model.game.Score;
-import org.ydautremay.ouist.domain.model.player.Player;
 import org.ydautremay.ouist.domain.model.game.Contract;
+import org.ydautremay.ouist.domain.model.game.Round;
+import org.ydautremay.ouist.domain.model.player.Player;
 import org.ydautremay.ouist.domain.model.player.PlayerNickName;
+import org.ydautremay.ouist.domain.model.scoresheet.Score;
 import org.ydautremay.ouist.domain.policies.ScorePolicy;
 
 /**
@@ -35,7 +35,6 @@ public class DefaultScoreService implements ScoreService {
         }
         for (Contract contract:round.getContracts()) {
             PlayerNickName p = contract.getContractId().getPlayer();
-            Score score = new Score(p);
             int scoreValue;
             if(nbTricksByPlayer.get(p) == contract.getNbTricks()){
                 scoreValue = scorePolicy.scoreForNotLoosing();
@@ -44,8 +43,7 @@ public class DefaultScoreService implements ScoreService {
                 scoreValue = - (scorePolicy.minusPerTrick() * (Math.abs(nbTricksByPlayer.get(p) - contract
                         .getNbTricks())));
             }
-            score.setValue(scoreValue);
-            round.getScores().add(score);
+            Score score = new Score(p, scoreValue);
         }
     }
 }

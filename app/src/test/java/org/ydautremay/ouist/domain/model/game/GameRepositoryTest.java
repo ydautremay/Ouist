@@ -14,7 +14,6 @@ import org.seedstack.jpa.Jpa;
 import org.seedstack.jpa.JpaUnit;
 import org.seedstack.seed.it.AbstractSeedIT;
 import org.seedstack.seed.transaction.Transactional;
-import org.ydautremay.ouist.domain.model.game.exceptions.GameActionException;
 import org.ydautremay.ouist.domain.model.player.PlayerNickName;
 
 /**
@@ -41,12 +40,40 @@ public class GameRepositoryTest extends AbstractSeedIT {
     @Test
     @Transactional
     @JpaUnit("ouist-jpa-unit")
-    public void testChaiList() throws GameActionException {
+    public void testChainList() throws Exception {
         Game game = gameFactory.createGame();
-        game.addPlayer(new PlayerNickName("nick1"));
-        game.addPlayer(new PlayerNickName("nick2"));
-        game.addPlayer(new PlayerNickName("nick3"));
+
+        PlayerNickName player1 = new PlayerNickName("nick1");
+        PlayerNickName player2 = new PlayerNickName("nick2");
+        PlayerNickName player3 = new PlayerNickName("nick3");
+
+        game.addPlayer(player1);
+        game.addPlayer(player2);
+        game.addPlayer(player3);
         gameRepository.persist(game);
+
+        game.startGame();
+        game.nextContract(2);
+        game.nextContract(3);
+        game.nextContract(1);
+
+        game.nextTrick(player2);
+        game.nextTrick(player2);
+        game.nextTrick(player2);
+        game.nextTrick(player2);
+        game.nextTrick(player2);
+        game.nextTrick(player2);
+        game.nextTrick(player2);
+
+        game.nextContract(5);
+        game.nextContract(4);
+        game.nextContract(6);
+
+        game.nextTrick(player1);
+        game.nextTrick(player2);
+        game.nextTrick(player3);
+
+        gameRepository.save(game);
 
         Game game2 = gameRepository.load(game.getEntityId());
         List<Chair> chairs = game2.getChairs();
