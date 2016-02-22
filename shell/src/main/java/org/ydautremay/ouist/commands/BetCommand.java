@@ -10,6 +10,7 @@ import org.seedstack.seed.spi.command.Argument;
 import org.seedstack.seed.spi.command.Command;
 import org.seedstack.seed.spi.command.CommandDefinition;
 import org.ydautremay.ouist.application.Session;
+import org.ydautremay.ouist.domain.model.game.Chair;
 import org.ydautremay.ouist.domain.model.game.Game;
 
 import org.ydautremay.ouist.application.RunningGamesRegistry;
@@ -49,8 +50,14 @@ public class BetCommand implements Command<String> {
             if(bet < 0){
                 return "Bets can only be positive";
             }
+            bets.add(bet);
         }
-        int sum = bets.stream().reduce(0, Integer::sum);
-        return null;
+        List<Chair> chairs = game.getChairs();
+        String toReturn = "Bets : ";
+        for (int i = 0; i <bets.size();  i++) {
+            game.nextContract(bets.get(i));
+            toReturn += chairs.get(i).getPlayer().getNickname() + " : " + bets.get(i) + "\n";
+        }
+        return toReturn;
     }
 }

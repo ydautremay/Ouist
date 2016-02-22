@@ -110,6 +110,9 @@ public class Game extends BaseAggregateRoot<UUID> {
 
     public GameState nextContract(int nbTricks) throws GameActionException,
             GameStateChangeException {
+        if(nbTricks < 0){
+            throw new GameActionException("Cannot bet a negative");
+        }
         NEW_CONTRACT.checkActionState(this);
         Round round = getCurrentRound();
         int nbContracts = round.getContracts().size();

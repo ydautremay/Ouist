@@ -4,8 +4,6 @@ import javax.inject.Inject;
 
 import org.seedstack.seed.spi.command.Command;
 import org.seedstack.seed.spi.command.CommandDefinition;
-import org.ydautremay.ouist.application.ApplicationStatus;
-
 import org.ydautremay.ouist.application.ApplicationStatusMonitor;
 
 /**
@@ -18,7 +16,7 @@ public class StopApplicationCommand implements Command<String> {
     ApplicationStatusMonitor applicationStatusMonitor;
 
     public String execute(Object object) throws Exception {
-        applicationStatusMonitor.stop(ApplicationStatus.STOPPED);
+        applicationStatusMonitor.stop();
         return "Stopping application...";
     }
 }
