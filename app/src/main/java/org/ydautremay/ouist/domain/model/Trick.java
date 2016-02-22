@@ -15,7 +15,7 @@ public class Trick {
     private Collection<Play> plays;
 
     public Trick(Player leader) {
-        this.plays = new ArrayList<Play>();
+        this.plays = new ArrayList<>();
         this.leader = leader;
     }
 

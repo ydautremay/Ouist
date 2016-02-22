@@ -18,7 +18,7 @@ public class StopApplicationCommand implements Command<String> {
     ApplicationStatusMonitor applicationStatusMonitor;
 
     public String execute(Object object) throws Exception {
-        applicationStatusMonitor.setStatus(ApplicationStatus.STOPPED);
+        applicationStatusMonitor.stop(ApplicationStatus.STOPPED);
         return "Stopping application...";
     }
 }

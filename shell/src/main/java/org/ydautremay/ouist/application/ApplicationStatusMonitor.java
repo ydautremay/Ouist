@@ -10,5 +10,5 @@ public interface ApplicationStatusMonitor {
 
     ApplicationStatus getStatus();
 
-    void setStatus(ApplicationStatus status);
+    void stop();
 }

@@ -55,7 +55,7 @@ public class Game extends BaseAggregateRoot<UUID> {
 
     Game() {
         this.chairs = new ArrayList<>();
-        this.rounds = new ArrayList<Round>();
+        this.rounds = new ArrayList<>();
         gameState = GameState.NEW;
     }
 
@@ -98,6 +98,10 @@ public class Game extends BaseAggregateRoot<UUID> {
         return gameState;
     }
 
+    public GameState finish() throws GameStateChangeException{
+        return gameState.finish(this);
+    }
+
     private Round newRound() {
         Round round = new Round(gameId, rounds.size());
         rounds.add(round);
@@ -109,9 +113,6 @@ public class Game extends BaseAggregateRoot<UUID> {
         NEW_CONTRACT.checkActionState(this);
         Round round = getCurrentRound();
         int nbContracts = round.getContracts().size();
-        if (nbContracts == chairs.size()) {
-            throw new GameActionException("Every player already made a contract");
-        }
         if (nbContracts == chairs.size() - 1) {
             //Sum all contracts to verify it is different from number of tricks
             int existingTricks = round.getContracts().stream().collect(Collectors.summingInt
@@ -121,7 +122,6 @@ public class Game extends BaseAggregateRoot<UUID> {
             }
             //Change state
             this.gameState = gameState.betsDone(this);
-            newRound();
         }
         PlayerNickName player = chairs.get(nbContracts).getPlayer();
         ContractId contractId = new ContractId(round.getRoundId(), player);
@@ -134,14 +134,12 @@ public class Game extends BaseAggregateRoot<UUID> {
         NEW_TRICK.checkActionState(this);
         Round round = getCurrentRound();
         int nbPlayedTricks = round.getPlayedTricks().size();
-        if (nbPlayedTricks == currentTrickAmount) {
-            throw new GameActionException("All tricks already played");
-        }
         if (nbPlayedTricks == currentTrickAmount - 1) {
             //Change state
             gameState = gameState.dealPlayed(this);
             //change amount of tricks for next deal
             updateTrickAmount();
+            newRound();
         }
         SimpleTrick newTrick = new SimpleTrick(round.getRoundId(), leader);
         round.getPlayedTricks().add(newTrick);
@@ -169,5 +167,9 @@ public class Game extends BaseAggregateRoot<UUID> {
 
     public GameState getGameState() {
         return gameState;
+    }
+
+    public int getCurrentTrickAmount() {
+        return currentTrickAmount;
     }
 }

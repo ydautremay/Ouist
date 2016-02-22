@@ -17,26 +17,12 @@ public enum GameAction {
             }
         }
     },
-    NEW_ROUND {
-        @Override
-        public void checkActionState(Game game) throws GameActionException {
-            if(game.getGameState() != GameState.READY){
-                throw new GameActionException("Cannot get in a new round");
-            }
-        }
-    },
     NEW_CONTRACT {
         @Override
         public void checkActionState(Game game) throws GameActionException {
             if(game.getGameState() != GameState.READY){
                 throw new GameActionException("Cannot get in a new round");
             }
-        }
-    },
-    NEW_DEAL {
-        @Override
-        public void checkActionState(Game game) throws GameActionException {
-
         }
     },
     NEW_TRICK {

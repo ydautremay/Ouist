@@ -25,5 +25,5 @@ public enum Card {
     NINETEEN,
     TWENTY,
     TWENTY_TWO,
-    FOOL;
+    FOOL
 }

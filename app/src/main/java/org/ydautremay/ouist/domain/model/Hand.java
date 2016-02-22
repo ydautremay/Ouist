@@ -18,7 +18,7 @@ public class Hand {
     }
 
     public Hand(Player player) {
-        this.cards = new ArrayList<Card>();
+        this.cards = new ArrayList<>();
         this.player = player;
     }
 

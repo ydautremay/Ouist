@@ -7,7 +7,7 @@ import org.ydautremay.ouist.domain.model.game.exceptions.GameStateChangeExceptio
 /**
  * Created by dautremayy on 18/02/2016.
  */
-public class ReadyRso implements GameStateOperations {
+public class ReadyGso implements GameStateOperations {
     @Override
     public GameState ready(Game game) throws GameStateChangeException {
         throw new GameStateChangeException();
@@ -37,6 +37,6 @@ public class ReadyRso implements GameStateOperations {
 
     @Override
     public GameState finish(Game game) throws GameStateChangeException {
-        throw new GameStateChangeException();
+        return GameState.FINISHED;
     }
 }

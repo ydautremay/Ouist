@@ -16,7 +16,7 @@ import org.ydautremay.ouist.domain.model.game.Game;
 @Singleton
 public class RunningGamesRegistryImpl implements RunningGamesRegistry {
 
-    private Map<UUID, Game> runningGames = new ConcurrentHashMap<UUID, Game>();
+    private Map<UUID, Game> runningGames = new ConcurrentHashMap<>();
 
     public Game getRunningGame(UUID gameId) {
         return runningGames.get(gameId);

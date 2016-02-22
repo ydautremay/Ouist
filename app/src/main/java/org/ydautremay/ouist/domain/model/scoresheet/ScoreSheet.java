@@ -49,7 +49,6 @@ public class ScoreSheet extends BaseAggregateRoot<UUID> {
 
     public ScoreLine newLine(RoundId roundId){
         ScoreLineId lineId = new ScoreLineId(sheetId, roundId);
-        ScoreLine newLine = new ScoreLine(lineId);
-        return newLine;
+        return new ScoreLine(lineId);
     }
 }

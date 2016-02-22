@@ -14,8 +14,8 @@ public class Deal {
     private Collection<Hand> hands;
 
     public Deal() {
-        this.playedTricks = new ArrayList<Trick>();
-        this.hands = new ArrayList<Hand>();
+        this.playedTricks = new ArrayList<>();
+        this.hands = new ArrayList<>();
     }
 
     public List<Trick> getPlayedTricks() {

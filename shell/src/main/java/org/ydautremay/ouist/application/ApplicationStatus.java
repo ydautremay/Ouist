@@ -5,5 +5,5 @@ package org.ydautremay.ouist.application;
  */
 public enum ApplicationStatus {
     STARTED,
-    STOPPED;
+    STOPPED
 }

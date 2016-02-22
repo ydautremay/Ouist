@@ -2,7 +2,7 @@
 
     <include resource="org/seedstack/seed/core/logging/logback-defaults.xml"/>
 
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="STDOUT-COLOR" />
     </root>
 </configuration>

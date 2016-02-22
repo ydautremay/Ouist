@@ -18,7 +18,7 @@ public class ApplicationStatusMonitorImpl implements ApplicationStatusMonitor {
         return status;
     }
 
-    public void setStatus(ApplicationStatus status) {
-        this.status = status;
+    public void stop() {
+        this.status = ApplicationStatus.STOPPED;
     }
 }
