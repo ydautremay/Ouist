@@ -18,7 +18,7 @@ public class StateCommand implements Command<String> {
 
     @Inject
     private Session session;
-    
+
     @Inject
     private RunningGamesRegistry runningGamesRegistry;
 
@@ -32,6 +32,6 @@ public class StateCommand implements Command<String> {
         if(game == null){
             return "The game you joined does not exist anymore";
         }
-
+        return "";
     }
 }
