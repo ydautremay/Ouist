@@ -57,6 +57,8 @@ public class Game extends BaseAggregateRoot<UUID> {
 
     private UUID scoreSheetId;
 
+    private boolean jump;
+
     Game() {
         this.chairs = new ArrayList<>();
         this.rounds = new ArrayList<>();
@@ -99,6 +101,7 @@ public class Game extends BaseAggregateRoot<UUID> {
         maxTricks = size.getSize() / chairs.size();
         currentTrickAmount = maxTricks;
         ascending = false;
+        jump = (maxTricks - 1) % chairs.size() == 0;
         return gameState;
     }
 
@@ -113,6 +116,9 @@ public class Game extends BaseAggregateRoot<UUID> {
         }else{
             PlayerNickName lastDealer = getCurrentRound().getDealer();
             round.setDealer(getNextPlayer(lastDealer));
+            if(jump){
+                round.setDealer(getNextPlayer(lastDealer));
+            }
         }
         rounds.add(round);
         return round;
