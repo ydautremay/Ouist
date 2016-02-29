@@ -5,13 +5,13 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.ydautremay.ouist.domain.model.Deal;
-import org.ydautremay.ouist.domain.model.Trick;
 import org.ydautremay.ouist.domain.model.game.Contract;
 import org.ydautremay.ouist.domain.model.game.Round;
-import org.ydautremay.ouist.domain.model.player.Player;
+import org.ydautremay.ouist.domain.model.game.SimpleTrick;
 import org.ydautremay.ouist.domain.model.player.PlayerNickName;
 import org.ydautremay.ouist.domain.model.scoresheet.Score;
+import org.ydautremay.ouist.domain.model.scoresheet.ScoreLine;
+import org.ydautremay.ouist.domain.model.scoresheet.ScoreSheet;
 import org.ydautremay.ouist.domain.policies.ScorePolicy;
 
 /**
@@ -22,11 +22,11 @@ public class DefaultScoreService implements ScoreService {
     @Inject
     private ScorePolicy scorePolicy;
 
-    public void computeScores(Round round) {
-        Deal deal = round.getDeal();
-        Map<Player, Integer> nbTricksByPlayer = new HashMap<>();
-        for (Trick trick:deal.getPlayedTricks()) {
-            Player p = trick.getLeader();
+    public void computeScores(ScoreSheet scoreSheet, Round round) {
+        ScoreLine scoreLine = scoreSheet.newLine(round.getRoundId());
+        Map<PlayerNickName, Integer> nbTricksByPlayer = new HashMap<>();
+        for (SimpleTrick trick:round.getPlayedTricks()) {
+            PlayerNickName p = trick.getLeader();
             if(nbTricksByPlayer.get(p) == null){
                 nbTricksByPlayer.put(p, 0);
             }
@@ -35,6 +35,9 @@ public class DefaultScoreService implements ScoreService {
         }
         for (Contract contract:round.getContracts()) {
             PlayerNickName p = contract.getContractId().getPlayer();
+            if(nbTricksByPlayer.get(p) == null){
+                nbTricksByPlayer.put(p, 0);
+            }
             int scoreValue;
             if(nbTricksByPlayer.get(p) == contract.getNbTricks()){
                 scoreValue = scorePolicy.scoreForNotLoosing();
@@ -44,6 +47,7 @@ public class DefaultScoreService implements ScoreService {
                         .getNbTricks())));
             }
             Score score = new Score(p, scoreValue);
+            scoreLine.getRoundScores().add(score);
         }
     }
 }

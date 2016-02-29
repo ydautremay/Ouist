@@ -1,9 +1,10 @@
 package org.ydautremay.ouist.domain.model.game;
 
 import org.ydautremay.ouist.domain.model.game.exceptions.GameStateChangeException;
-import org.ydautremay.ouist.domain.model.game.state.DealtGso;
+import org.ydautremay.ouist.domain.model.game.state.BetsDoneGso;
 import org.ydautremay.ouist.domain.model.game.state.FinishedGso;
 import org.ydautremay.ouist.domain.model.game.state.GameStateOperations;
+import org.ydautremay.ouist.domain.model.game.state.LastBetGso;
 import org.ydautremay.ouist.domain.model.game.state.NewGso;
 import org.ydautremay.ouist.domain.model.game.state.ReadyGso;
 
@@ -13,7 +14,8 @@ import org.ydautremay.ouist.domain.model.game.state.ReadyGso;
 public enum GameState implements GameStateOperations {
     NEW(new NewGso()),
     READY(new ReadyGso()),
-    DEALT(new DealtGso()),
+    LAST_BET(new LastBetGso()),
+    BETS_DONE(new BetsDoneGso()),
     FINISHED(new FinishedGso());
 
     private final GameStateOperations operations;
@@ -25,6 +27,11 @@ public enum GameState implements GameStateOperations {
     @Override
     public GameState ready(Game game) throws GameStateChangeException {
         return operations.ready(game);
+    }
+
+    @Override
+    public GameState lastBet(Game game) throws GameStateChangeException{
+        return operations.lastBet(game);
     }
 
     @Override

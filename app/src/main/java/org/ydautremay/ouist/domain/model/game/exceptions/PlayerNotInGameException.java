@@ -3,7 +3,7 @@ package org.ydautremay.ouist.domain.model.game.exceptions;
 /**
  * Created by dautremayy on 15/02/2016.
  */
-public class PlayerNotInGameException extends Exception {
+public class PlayerNotInGameException extends GameActionException {
     public PlayerNotInGameException() {
     }
 

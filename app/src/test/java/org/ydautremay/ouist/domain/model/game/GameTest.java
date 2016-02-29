@@ -47,25 +47,26 @@ public class GameTest {
         GameState gameState = underTest.getGameState();
 
         assertThat(gameState).isEqualTo( GameState.READY);
+        assertThat(underTest.getCurrentRound().getDealer()).isEqualTo(player1);
 
         gameState = underTest.nextContract(0);
         assertThat(gameState).isEqualTo( GameState.READY);
         gameState = underTest.nextContract(0);
         assertThat(gameState).isEqualTo( GameState.READY);
         gameState = underTest.nextContract(0);
-        assertThat(gameState).isEqualTo( GameState.READY);
+        assertThat(gameState).isEqualTo( GameState.LAST_BET);
         gameState = underTest.nextContract(0);
-        assertThat(gameState).isEqualTo( GameState.DEALT);
+        assertThat(gameState).isEqualTo( GameState.BETS_DONE);
         assertThat(underTest.getRounds()).hasSize(1);
 
         gameState = underTest.nextTrick(player1);
-        assertThat(gameState).isEqualTo( GameState.DEALT);
+        assertThat(gameState).isEqualTo( GameState.BETS_DONE);
         gameState = underTest.nextTrick(player2);
-        assertThat(gameState).isEqualTo( GameState.DEALT);
+        assertThat(gameState).isEqualTo( GameState.BETS_DONE);
         gameState = underTest.nextTrick(player1);
-        assertThat(gameState).isEqualTo( GameState.DEALT);
+        assertThat(gameState).isEqualTo( GameState.BETS_DONE);
         gameState =  underTest.nextTrick(player3);
-        assertThat(gameState).isEqualTo( GameState.DEALT);
+        assertThat(gameState).isEqualTo( GameState.BETS_DONE);
         gameState = underTest.nextTrick(player4);
         assertThat(gameState).isEqualTo( GameState.READY);
         assertThat(underTest.getRounds()).hasSize(2);
@@ -74,14 +75,16 @@ public class GameTest {
 
         Whitebox.setInternalState(underTest, "currentTrickAmount", 1);
 
+        assertThat(underTest.getCurrentRound().getDealer()).isEqualTo(player2);
+
         gameState = underTest.nextContract(0);
         assertThat(gameState).isEqualTo( GameState.READY);
         gameState = underTest.nextContract(0);
         assertThat(gameState).isEqualTo( GameState.READY);
         gameState = underTest.nextContract(0);
-        assertThat(gameState).isEqualTo( GameState.READY);
+        assertThat(gameState).isEqualTo( GameState.LAST_BET);
         gameState = underTest.nextContract(0);
-        assertThat(gameState).isEqualTo( GameState.DEALT);
+        assertThat(gameState).isEqualTo( GameState.BETS_DONE);
 
         gameState = underTest.nextTrick(player1);
         assertThat(gameState).isEqualTo( GameState.READY);
@@ -125,7 +128,9 @@ public class GameTest {
         Game underTest = new Game();
         Whitebox.setInternalState(underTest, "gameId", UUID.randomUUID());
         underTest.addPlayer(new PlayerNickName("player"));
+        underTest.addPlayer(new PlayerNickName("player2"));
         underTest.startGame();
+        underTest.nextContract(0);
         underTest.nextContract(0);
         underTest.nextContract(0);
     }
@@ -154,18 +159,10 @@ public class GameTest {
         Game underTest = new Game();
         Whitebox.setInternalState(underTest, "gameId", UUID.randomUUID());
         underTest.addPlayer(new PlayerNickName("player"));
+        underTest.addPlayer(new PlayerNickName("player2"));
         underTest.startGame();
         underTest.nextContract(0);
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
+        underTest.nextContract(1);
         underTest.nextTrick(new PlayerNickName("player"));
         underTest.nextTrick(new PlayerNickName("player"));
         underTest.nextTrick(new PlayerNickName("player"));

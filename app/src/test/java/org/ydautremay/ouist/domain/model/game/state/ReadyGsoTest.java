@@ -19,7 +19,7 @@ public class ReadyGsoTest {
 
     @Test
     public void bets_done() throws GameStateChangeException {
-        assertThat(gso.betsDone(game)).isEqualTo(GameState.DEALT);
+        assertThat(gso.betsDone(game)).isEqualTo(GameState.BETS_DONE);
     }
 
     @Test

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -28,6 +30,9 @@ public class GameRepositoryTest extends AbstractSeedIT {
     @Jpa
     private Repository<Game, UUID> gameRepository;
 
+    @Inject
+    private EntityManager entityManager;
+
     @Test
     @Transactional
     @JpaUnit("ouist-jpa-unit")
@@ -42,6 +47,7 @@ public class GameRepositoryTest extends AbstractSeedIT {
     @JpaUnit("ouist-jpa-unit")
     public void testChainList() throws Exception {
         Game game = gameFactory.createGame();
+        game.setScoreSheetId(UUID.randomUUID());
 
         PlayerNickName player1 = new PlayerNickName("nick1");
         PlayerNickName player2 = new PlayerNickName("nick2");
@@ -76,6 +82,7 @@ public class GameRepositoryTest extends AbstractSeedIT {
         gameRepository.save(game);
 
         Game game2 = gameRepository.load(game.getEntityId());
+        assertThat(game2.getScoreSheetId()).isNotNull();
         List<Chair> chairs = game2.getChairs();
         Assertions.assertThat(chairs.get(0).getPlayer().getNickname()).isEqualTo("nick1");
         Assertions.assertThat(chairs.get(1).getPlayer().getNickname()).isEqualTo("nick2");

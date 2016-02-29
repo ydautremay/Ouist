@@ -11,9 +11,9 @@ import org.ydautremay.ouist.domain.model.game.exceptions.GameStateChangeExceptio
 /**
  * Created by dautremayy on 22/02/2016.
  */
-public class DealtGsoTest {
+public class BetsDoneGsoTest {
 
-    private GameStateOperations gso = new DealtGso();
+    private GameStateOperations gso = new BetsDoneGso();
 
     private Game game = Mockito.mock(Game.class);
 

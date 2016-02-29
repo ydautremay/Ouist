@@ -5,10 +5,10 @@ import static org.ydautremay.ouist.domain.model.game.state.GameAction.NEW_CONTRA
 import static org.ydautremay.ouist.domain.model.game.state.GameAction.NEW_TRICK;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
@@ -21,8 +21,10 @@ import javax.persistence.OrderColumn;
 import org.seedstack.business.domain.BaseAggregateRoot;
 import org.seedstack.business.domain.Identity;
 import org.seedstack.business.domain.identity.UUIDHandler;
+import org.ydautremay.ouist.domain.model.game.exceptions.CannotBetException;
 import org.ydautremay.ouist.domain.model.game.exceptions.GameActionException;
 import org.ydautremay.ouist.domain.model.game.exceptions.GameStateChangeException;
+import org.ydautremay.ouist.domain.model.game.exceptions.PlayerNotInGameException;
 import org.ydautremay.ouist.domain.model.player.PlayerNickName;
 
 /**
@@ -53,6 +55,8 @@ public class Game extends BaseAggregateRoot<UUID> {
 
     private boolean ascending;
 
+    private UUID scoreSheetId;
+
     Game() {
         this.chairs = new ArrayList<>();
         this.rounds = new ArrayList<>();
@@ -64,7 +68,7 @@ public class Game extends BaseAggregateRoot<UUID> {
     }
 
     public List<Chair> getChairs() {
-        return Collections.unmodifiableList(chairs);
+        return chairs;
     }
 
     public void addPlayer(PlayerNickName player) throws GameActionException {
@@ -104,6 +108,12 @@ public class Game extends BaseAggregateRoot<UUID> {
 
     private Round newRound() {
         Round round = new Round(gameId, rounds.size());
+        if(rounds.isEmpty()){
+            round.setDealer(chairs.get(0).getPlayer());
+        }else{
+            PlayerNickName lastDealer = getCurrentRound().getDealer();
+            round.setDealer(getNextPlayer(lastDealer));
+        }
         rounds.add(round);
         return round;
     }
@@ -121,19 +131,33 @@ public class Game extends BaseAggregateRoot<UUID> {
             int existingTricks = round.getContracts().stream().collect(Collectors.summingInt
                     (Contract::getNbTricks));
             if (existingTricks + nbTricks == currentTrickAmount) {
-                throw new GameActionException("Last player cannot bet " + nbTricks);
+                throw new CannotBetException("Last player cannot bet " + nbTricks);
             }
             //Change state
             this.gameState = gameState.betsDone(this);
+        }else if(nbContracts == chairs.size() - 2){
+            //Change state
+            this.gameState = gameState.lastBet(this);
         }
-        PlayerNickName player = chairs.get(nbContracts).getPlayer();
+        PlayerNickName player = getPlayerToBet(round);
         ContractId contractId = new ContractId(round.getRoundId(), player);
         Contract contract = new Contract(contractId, nbTricks);
         round.getContracts().add(contract);
         return gameState;
     }
 
+    public PlayerNickName getPlayerToBet(Round round) {
+        int nbContracts = round.getContracts().size();
+        int dealerIndex = IntStream.range(0, chairs.size()).filter(i -> chairs.get(i).getPlayer().equals
+                (round.getDealer())).findFirst().getAsInt();
+        int nextContractIndex = (dealerIndex + nbContracts + 1)%chairs.size();
+        return chairs.get(nextContractIndex).getPlayer();
+    }
+
     public GameState nextTrick(PlayerNickName leader) throws GameActionException, GameStateChangeException {
+        if(chairs.stream().noneMatch(c -> c.getPlayer().equals(leader))){
+            throw new PlayerNotInGameException();
+        }
         NEW_TRICK.checkActionState(this);
         Round round = getCurrentRound();
         int nbPlayedTricks = round.getPlayedTricks().size();
@@ -167,6 +191,31 @@ public class Game extends BaseAggregateRoot<UUID> {
         return rounds.get(rounds.size() - 1);
     }
 
+    public Round getLastRound() {
+        return rounds.get(rounds.size() - 2);
+    }
+
+    public int getNextForbiddenBet(){
+        if(gameState != GameState.LAST_BET){
+            return -1;
+        }else{
+            Round round = getCurrentRound();
+            int existingTricks = round.getContracts().stream().collect(Collectors.summingInt
+                    (Contract::getNbTricks));
+            return currentTrickAmount - existingTricks;
+        }
+    }
+
+    public PlayerNickName getNextPlayer(PlayerNickName p){
+        int chairIndex = IntStream.range(0, chairs.size()).filter(i -> chairs.get(i).getPlayer().equals
+                (p)).findFirst().getAsInt();
+        if(chairIndex == chairs.size() - 1){
+            chairIndex = 0;
+        }else{
+            chairIndex ++;
+        }
+        return chairs.get(chairIndex).getPlayer();
+    }
 
     public GameState getGameState() {
         return gameState;
@@ -174,5 +223,13 @@ public class Game extends BaseAggregateRoot<UUID> {
 
     public int getCurrentTrickAmount() {
         return currentTrickAmount;
+    }
+
+    public UUID getScoreSheetId() {
+        return scoreSheetId;
+    }
+
+    public void setScoreSheetId(UUID scoreSheetId) {
+        this.scoreSheetId = scoreSheetId;
     }
 }

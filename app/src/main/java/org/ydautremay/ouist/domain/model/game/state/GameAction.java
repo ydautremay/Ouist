@@ -20,7 +20,7 @@ public enum GameAction {
     NEW_CONTRACT {
         @Override
         public void checkActionState(Game game) throws GameActionException {
-            if(game.getGameState() != GameState.READY){
+            if(game.getGameState() != GameState.READY && game.getGameState() != GameState.LAST_BET){
                 throw new GameActionException("Cannot get in a new round");
             }
         }
@@ -28,7 +28,7 @@ public enum GameAction {
     NEW_TRICK {
         @Override
         public void checkActionState(Game game) throws GameActionException {
-            if(game.getGameState() != GameState.DEALT){
+            if(game.getGameState() != GameState.BETS_DONE){
                 throw new GameActionException("A new trick can only go when game is dealt");
             }
         }

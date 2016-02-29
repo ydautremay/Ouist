@@ -11,6 +11,8 @@ public interface GameStateOperations {
 
     GameState ready(Game game) throws GameStateChangeException;
 
+    GameState lastBet(Game game) throws GameStateChangeException;
+
     GameState betsDone(Game game) throws GameStateChangeException;
 
     GameState dealPlayed(Game game) throws GameStateChangeException;

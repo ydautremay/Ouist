@@ -26,4 +26,8 @@ public class PlayerNickName extends BaseValueObject {
     private void setNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public String toString(){
+        return nickname;
+    }
 }

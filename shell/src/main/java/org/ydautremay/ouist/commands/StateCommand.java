@@ -4,9 +4,10 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import org.seedstack.business.domain.Repository;
+import org.seedstack.jpa.Jpa;
 import org.seedstack.seed.spi.command.Command;
 import org.seedstack.seed.spi.command.CommandDefinition;
-import org.ydautremay.ouist.application.RunningGamesRegistry;
 import org.ydautremay.ouist.application.Session;
 import org.ydautremay.ouist.domain.model.game.Game;
 
@@ -20,7 +21,8 @@ public class StateCommand implements Command<String> {
     private Session session;
 
     @Inject
-    private RunningGamesRegistry runningGamesRegistry;
+    @Jpa
+    private Repository<Game, UUID> gameRepository;
 
     @Override
     public String execute(Object object) throws Exception {
@@ -28,7 +30,7 @@ public class StateCommand implements Command<String> {
         if(gameId == null){
             return "You need to join a game. Please use the join command";
         }
-        Game game = runningGamesRegistry.getRunningGame(gameId);
+        Game game = gameRepository.load(gameId);
         if(game == null){
             return "The game you joined does not exist anymore";
         }

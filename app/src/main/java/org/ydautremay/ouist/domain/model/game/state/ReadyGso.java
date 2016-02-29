@@ -14,6 +14,11 @@ public class ReadyGso implements GameStateOperations {
     }
 
     @Override
+    public GameState lastBet(Game game) throws GameStateChangeException {
+        return GameState.LAST_BET;
+    }
+
+    @Override
     public GameState betsDone(Game game) throws GameStateChangeException {
 //        List<Chair> chairs = game.getChairs();
 //        List<Contract> contracts = game.getCurrentRound().getContracts();
@@ -27,7 +32,7 @@ public class ReadyGso implements GameStateOperations {
 //                throw new GameStateChangeException("Not the same players on the chairs have bet !!");
 //            }
 //        }
-        return GameState.DEALT;
+        throw new GameStateChangeException();
     }
 
     @Override

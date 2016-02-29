@@ -3,9 +3,9 @@ package org.ydautremay.ouist.domain.model.scoresheet;
 import java.util.UUID;
 
 import javax.persistence.Embeddable;
+import javax.persistence.OrderColumn;
 
 import org.seedstack.business.domain.BaseValueObject;
-import org.ydautremay.ouist.domain.model.game.RoundId;
 
 /**
  * Created by dautremayy on 19/02/2016.
@@ -15,14 +15,15 @@ public class ScoreLineId extends BaseValueObject {
 
     private UUID scoreSheetId;
 
-    private RoundId roundId;
+    @OrderColumn(name="linNb")
+    private int lineNb;
 
     ScoreLineId() {
     }
 
-    ScoreLineId(UUID scoreSheetId, RoundId roundId) {
+    ScoreLineId(UUID scoreSheetId, int lineNb) {
         this.scoreSheetId = scoreSheetId;
-        this.roundId = roundId;
+        this.lineNb = lineNb;
     }
 
     public UUID getScoreSheetId() {
@@ -33,11 +34,11 @@ public class ScoreLineId extends BaseValueObject {
         this.scoreSheetId = roundId;
     }
 
-    public RoundId getRoundId() {
-        return roundId;
+    public int getLineNb() {
+        return lineNb;
     }
 
-    public void setRoundId(RoundId roundId) {
-        this.roundId = roundId;
+    public void setRoundId(int lineNb) {
+        this.lineNb = lineNb;
     }
 }

@@ -7,11 +7,16 @@ import org.ydautremay.ouist.domain.model.game.exceptions.GameStateChangeExceptio
 /**
  * Created by dautremayy on 18/02/2016.
  */
-public class DealtGso implements GameStateOperations {
+public class BetsDoneGso implements GameStateOperations {
     @Override
     public GameState ready(Game game) throws GameStateChangeException {
         throw new GameStateChangeException();
    }
+
+    @Override
+    public GameState lastBet(Game game) throws GameStateChangeException {
+        throw new GameStateChangeException();
+    }
 
     @Override
     public GameState betsDone(Game game) throws GameStateChangeException {

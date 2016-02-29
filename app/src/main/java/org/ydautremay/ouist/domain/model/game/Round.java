@@ -15,6 +15,7 @@ import javax.persistence.Transient;
 
 import org.seedstack.business.domain.BaseEntity;
 import org.ydautremay.ouist.domain.model.Deal;
+import org.ydautremay.ouist.domain.model.player.PlayerNickName;
 
 /**
  * Created by dautremayy on 22/01/2016.
@@ -24,6 +25,8 @@ public class Round extends BaseEntity<RoundId> {
 
     @EmbeddedId
     private RoundId roundId;
+
+    private PlayerNickName dealer;
 
     @Transient
     private Deal deal;
@@ -68,5 +71,13 @@ public class Round extends BaseEntity<RoundId> {
     @Override
     public RoundId getEntityId() {
         return roundId;
+    }
+
+    public PlayerNickName getDealer() {
+        return dealer;
+    }
+
+    public void setDealer(PlayerNickName dealer) {
+        this.dealer = dealer;
     }
 }

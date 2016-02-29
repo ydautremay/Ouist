@@ -1,5 +1,6 @@
 package org.ydautremay.ouist.infrastructure.policies;
 
+import org.seedstack.business.domain.DomainPolicy;
 import org.seedstack.seed.Configuration;
 
 import org.ydautremay.ouist.domain.policies.ScorePolicy;
@@ -7,6 +8,7 @@ import org.ydautremay.ouist.domain.policies.ScorePolicy;
 /**
  * Created by dautremayy on 22/01/2016.
  */
+@DomainPolicy
 public class PropsScorePolicy implements ScorePolicy {
 
     @Configuration("score.base")
@@ -27,6 +29,6 @@ public class PropsScorePolicy implements ScorePolicy {
     }
 
     public int minusPerTrick() {
-        return baseScore;
+        return minus;
     }
 }
