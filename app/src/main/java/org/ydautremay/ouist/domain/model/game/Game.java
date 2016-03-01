@@ -96,6 +96,9 @@ public class Game extends BaseAggregateRoot<UUID> {
     }
 
     public GameState startGame() throws GameStateChangeException {
+        if(chairs.size() >= 6){
+            size = DeckSize.BIG;
+        }
         gameState = gameState.ready(this);
         newRound();
         maxTricks = size.getSize() / chairs.size();
@@ -118,6 +121,7 @@ public class Game extends BaseAggregateRoot<UUID> {
             PlayerNickName nextDealer = getNextPlayer(lastDealer);
             if(currentTrickAmount == maxTricks && nextDealer.equals(playerToJump)){
                 nextDealer = getNextPlayer(nextDealer);
+                playerToJump = nextDealer;
             }
             round.setDealer(nextDealer);
         }
