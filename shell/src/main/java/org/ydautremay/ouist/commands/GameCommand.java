@@ -47,6 +47,10 @@ public class GameCommand implements Command<String> {
             + "name")
     private boolean start;
 
+    @Option(name = "f", longName = "finish", description = "finishes the game with given id or the created "
+            + "name")
+    private boolean finish;
+
     @Option(name = "d", longName = "describe", description = "Describes the current game")
     private boolean describe;
 
@@ -71,7 +75,7 @@ public class GameCommand implements Command<String> {
     @JpaUnit("ouist-jpa-unit")
     public String execute(Object object) throws Exception {
         try {
-            if (!create && playersToAdd == null && !start && !describe) {
+            if (!create && playersToAdd == null && !start && !describe && !finish) {
                 return "No option given";
             }
             if (create && gameId != null) {
@@ -83,9 +87,15 @@ public class GameCommand implements Command<String> {
                 game = createGame();
                 toReturn += "Game created with id " + game.getGameId() + "\n";
             } else {
+                if(gameId == null){
+                    UUID gameId = session.getCurrentGameId();
+                    if (gameId == null) {
+                        return "No game id specified, or option c or game in session";
+                    }
+                }
                 game = gameRepository.load(UUID.fromString(gameId));
                 if (game == null) {
-                    return "No game with id " + gameId + " is running";
+                    return "No game with id " + gameId + " exists";
                 }
             }
             session.setCurrentGameId(game.getGameId());
@@ -108,6 +118,10 @@ public class GameCommand implements Command<String> {
                 for (Chair chair : game.getChairs()) {
                     toReturn += chair.getPlayer().getNickname() + " ";
                 }
+            }
+            if(finish){
+                game.finish();
+                gameRepository.save(game);
             }
             return toReturn;
         }catch(Exception e){
