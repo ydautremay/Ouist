@@ -14,19 +14,25 @@ public class FinishedGso implements GameStateOperations {
     }
 
     @Override
-    public GameState lastBet(Game game) throws GameStateChangeException {
+    public GameState bet(Game game) throws GameStateChangeException {
         throw new GameStateChangeException();
     }
 
     @Override
-    public GameState betsDone(Game game) throws GameStateChangeException {
+    public GameState cancelBet(Game game) throws GameStateChangeException {
         throw new GameStateChangeException();
     }
 
     @Override
-    public GameState dealPlayed(Game game) throws GameStateChangeException {
+    public GameState play(Game game) throws GameStateChangeException {
         throw new GameStateChangeException();
     }
+
+    @Override
+    public GameState cancelPlay(Game game) throws GameStateChangeException {
+        throw new GameStateChangeException();
+    }
+
 
     @Override
     public GameState finish(Game game) throws GameStateChangeException {

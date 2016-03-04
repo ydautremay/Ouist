@@ -75,7 +75,7 @@ public class BetCommand implements Command<String> {
                     }
                     toReturn += "\n";
                 }
-                if (state == GameState.BETS_DONE) {
+                if (state == GameState.FIRST_PLAY) {
                     toReturn += "Every player has bet. Play time !";
                     break;
                 }
@@ -84,7 +84,7 @@ public class BetCommand implements Command<String> {
                 return toReturn;
             }
         }
-        if(state == GameState.READY){
+        if(state == GameState.BETTING){
             toReturn += "Next player to bet : " + game.getPlayerToBet(game.getCurrentRound());
         }
         gameRepository.save(game);

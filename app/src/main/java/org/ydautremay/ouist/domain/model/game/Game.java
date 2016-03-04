@@ -1,9 +1,5 @@
 package org.ydautremay.ouist.domain.model.game;
 
-import static org.ydautremay.ouist.domain.model.game.state.GameAction.CHANGE_PLAYERS;
-import static org.ydautremay.ouist.domain.model.game.state.GameAction.NEW_CONTRACT;
-import static org.ydautremay.ouist.domain.model.game.state.GameAction.NEW_TRICK;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +18,7 @@ import org.seedstack.business.domain.BaseAggregateRoot;
 import org.seedstack.business.domain.Identity;
 import org.seedstack.business.domain.identity.UUIDHandler;
 import org.ydautremay.ouist.domain.model.game.exceptions.CannotBetException;
+import org.ydautremay.ouist.domain.model.game.exceptions.CannotChangePlayersException;
 import org.ydautremay.ouist.domain.model.game.exceptions.GameActionException;
 import org.ydautremay.ouist.domain.model.game.exceptions.GameStateChangeException;
 import org.ydautremay.ouist.domain.model.game.exceptions.PlayerNotInGameException;
@@ -74,7 +71,9 @@ public class Game extends BaseAggregateRoot<UUID> {
     }
 
     public void addPlayer(PlayerNickName player) throws GameActionException {
-        CHANGE_PLAYERS.checkActionState(this);
+        if(gameState != GameState.READY){
+            throw new CannotChangePlayersException("Can only change players when round is over");
+        }
         if (chairs.stream().noneMatch(c -> c.getPlayer().equals(player))) {
             Chair chair = new Chair(player);
             chairs.add(chair);
@@ -82,7 +81,9 @@ public class Game extends BaseAggregateRoot<UUID> {
     }
 
     public void removePlayer(PlayerNickName nick) throws GameActionException {
-        CHANGE_PLAYERS.checkActionState(this);
+        if(gameState != GameState.READY){
+            throw new CannotChangePlayersException("Can only change players when round is over");
+        }
         chairs.removeIf(chair -> chair.getPlayer().equals(nick));
     }
 
@@ -131,29 +132,31 @@ public class Game extends BaseAggregateRoot<UUID> {
 
     public GameState nextContract(int nbTricks) throws GameActionException,
             GameStateChangeException {
-        if(nbTricks < 0){
+        if(nbTricks < 0) {
             throw new GameActionException("Cannot bet a negative");
         }
-        NEW_CONTRACT.checkActionState(this);
+        GameState state = gameState.bet(this);
         Round round = getCurrentRound();
-        int nbContracts = round.getContracts().size();
-        if (nbContracts == chairs.size() - 1) {
+        if(state == GameState.LAST_BET){
             //Sum all contracts to verify it is different from number of tricks
             int existingTricks = round.getContracts().stream().collect(Collectors.summingInt
                     (Contract::getNbTricks));
             if (existingTricks + nbTricks == currentTrickAmount) {
                 throw new CannotBetException("Last player cannot bet " + nbTricks);
             }
-            //Change state
-            this.gameState = gameState.betsDone(this);
-        }else if(nbContracts == chairs.size() - 2){
-            //Change state
-            this.gameState = gameState.lastBet(this);
         }
         PlayerNickName player = getPlayerToBet(round);
         ContractId contractId = new ContractId(round.getRoundId(), player);
         Contract contract = new Contract(contractId, nbTricks);
         round.getContracts().add(contract);
+        gameState = state;
+        return gameState;
+    }
+
+    public GameState cancelContract() throws GameStateChangeException {
+        gameState = gameState.cancelBet(this);
+        Round round = getCurrentRound();
+        round.getContracts().remove(getPlayerToCancelBet(round));
         return gameState;
     }
 
@@ -165,22 +168,40 @@ public class Game extends BaseAggregateRoot<UUID> {
         return chairs.get(nextContractIndex).getPlayer();
     }
 
+    private PlayerNickName getPlayerToCancelBet(Round round) {
+        int nbContracts = round.getContracts().size();
+        int dealerIndex = IntStream.range(0, chairs.size()).filter(i -> chairs.get(i).getPlayer().equals
+                (round.getDealer())).findFirst().getAsInt();
+        int nextContractIndex = (dealerIndex + nbContracts)%chairs.size();
+        return chairs.get(nextContractIndex).getPlayer();
+    }
+
     public GameState nextTrick(PlayerNickName leader) throws GameActionException, GameStateChangeException {
         if(chairs.stream().noneMatch(c -> c.getPlayer().equals(leader))){
             throw new PlayerNotInGameException();
         }
-        NEW_TRICK.checkActionState(this);
+        GameState state = gameState.play(this);
         Round round = getCurrentRound();
-        int nbPlayedTricks = round.getPlayedTricks().size();
-        if (nbPlayedTricks == currentTrickAmount - 1) {
-            //Change state
-            gameState = gameState.dealPlayed(this);
-            //change amount of tricks for next deal
-            updateTrickAmount();
-            newRound();
-        }
         SimpleTrick newTrick = new SimpleTrick(round.getRoundId(), leader);
         round.getPlayedTricks().add(newTrick);
+        if (state == GameState.READY) {
+            //change amount of tricks for next deal
+            updateTrickAmount();
+            //new round
+            newRound();
+        }
+        gameState = state;
+        return gameState;
+    }
+
+    public GameState cancelPlay() throws GameStateChangeException {
+        GameState state = gameState.cancelPlay(this);
+        if(gameState == GameState.READY){
+            rounds.remove(rounds.size() - 1); //exists because state verifies it
+        }
+        Round round = getCurrentRound();
+        round.getPlayedTricks().remove(round.getPlayedTricks().size() - 1); //exists because state verifies it
+        gameState = state;
         return gameState;
     }
 
@@ -199,11 +220,19 @@ public class Game extends BaseAggregateRoot<UUID> {
     }
 
     public Round getCurrentRound() {
-        return rounds.get(rounds.size() - 1);
+        if(rounds.size() > 0) {
+            return rounds.get(rounds.size() - 1);
+        }else{
+            return null;
+        }
     }
 
     public Round getLastRound() {
-        return rounds.get(rounds.size() - 2);
+        if(rounds.size() > 1){
+            return rounds.get(rounds.size() - 2);
+        }else{
+            return null;
+        }
     }
 
     public int getNextForbiddenBet(){
