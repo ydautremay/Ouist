@@ -39,7 +39,7 @@ public class PlayingGso implements GameStateOperations {
     public GameState cancelPlay(Game game) throws GameStateChangeException {
         Round round = game.getCurrentRound();
         int nbPlays = round.getPlayedTricks().size();
-        if(nbPlays == 2) {
+        if(nbPlays == 1) {
             return GameState.FIRST_PLAY;
         }
         return GameState.PLAYING;

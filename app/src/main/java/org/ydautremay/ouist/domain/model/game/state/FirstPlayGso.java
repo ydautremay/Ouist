@@ -25,6 +25,9 @@ public class FirstPlayGso implements GameStateOperations {
 
     @Override
     public GameState play(Game game) throws GameStateChangeException {
+        if(game.getCurrentTrickAmount() == 1) {
+            return GameState.READY;
+        }
         return GameState.PLAYING;
     }
 

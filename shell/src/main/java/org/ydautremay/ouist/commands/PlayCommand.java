@@ -54,6 +54,7 @@ public class PlayCommand implements Command<String> {
     @Inject
     private ScoreService scoreService;
 
+    @Override
     @Transactional
     @JpaUnit("ouist-jpa-unit")
     public String execute(Object object) throws Exception {
@@ -92,7 +93,7 @@ public class PlayCommand implements Command<String> {
                 int total = scoreSheet.getTotal(player);
                 totals.add(new Score(player, total));
             }
-            Collections.sort(totals, Comparator.comparing(score -> score.getValue()));
+            Collections.sort(totals, new ScoreComparator());
             for (Score score:totals) {
                 toReturn += score.getPlayer() + " : " + score.getValue() + "\n";
             }
@@ -116,5 +117,13 @@ public class PlayCommand implements Command<String> {
             }
         }
         return null;
+    }
+
+    private static class ScoreComparator implements Comparator<Score>{
+
+        @Override
+        public int compare(Score o1, Score o2) {
+            return ((Integer)o1.getValue()).compareTo(o2.getValue());
+        }
     }
 }

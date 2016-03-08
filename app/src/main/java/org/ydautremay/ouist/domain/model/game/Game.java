@@ -71,7 +71,7 @@ public class Game extends BaseAggregateRoot<UUID> {
     }
 
     public void addPlayer(PlayerNickName player) throws GameActionException {
-        if(gameState != GameState.READY){
+        if(gameState != GameState.NEW){
             throw new CannotChangePlayersException("Can only change players when round is over");
         }
         if (chairs.stream().noneMatch(c -> c.getPlayer().equals(player))) {
@@ -81,7 +81,7 @@ public class Game extends BaseAggregateRoot<UUID> {
     }
 
     public void removePlayer(PlayerNickName nick) throws GameActionException {
-        if(gameState != GameState.READY){
+        if(gameState != GameState.NEW){
             throw new CannotChangePlayersException("Can only change players when round is over");
         }
         chairs.removeIf(chair -> chair.getPlayer().equals(nick));
@@ -156,7 +156,8 @@ public class Game extends BaseAggregateRoot<UUID> {
     public GameState cancelContract() throws GameStateChangeException {
         gameState = gameState.cancelBet(this);
         Round round = getCurrentRound();
-        round.getContracts().remove(getPlayerToCancelBet(round));
+        round.getContracts().removeIf(contract -> contract.getContractId().getPlayer().equals(getPlayerToCancelBet
+                (round)));
         return gameState;
     }
 
@@ -198,6 +199,7 @@ public class Game extends BaseAggregateRoot<UUID> {
         GameState state = gameState.cancelPlay(this);
         if(gameState == GameState.READY){
             rounds.remove(rounds.size() - 1); //exists because state verifies it
+            cancelTrickAmount();
         }
         Round round = getCurrentRound();
         round.getPlayedTricks().remove(round.getPlayedTricks().size() - 1); //exists because state verifies it
@@ -216,6 +218,20 @@ public class Game extends BaseAggregateRoot<UUID> {
             currentTrickAmount++;
         }else{
             currentTrickAmount--;
+    }
+    }
+
+    private void cancelTrickAmount() {
+        if(currentTrickAmount == maxTricks){
+            ascending = true;
+        }
+        if(currentTrickAmount == 1) {
+            ascending = false;
+        }
+        if (ascending) {
+            currentTrickAmount--;
+        } else {
+            currentTrickAmount++;
         }
     }
 

@@ -35,6 +35,7 @@ public class BetCommand implements Command<String> {
     @Jpa
     private Repository<Game, UUID> gameRepository;
 
+    @Override
     @Transactional
     @JpaUnit("ouist-jpa-unit")
     public String execute(Object object) throws Exception {

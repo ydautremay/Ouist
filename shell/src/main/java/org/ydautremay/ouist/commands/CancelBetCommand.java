@@ -6,9 +6,11 @@ import javax.inject.Inject;
 
 import org.seedstack.business.domain.Repository;
 import org.seedstack.jpa.Jpa;
+import org.seedstack.jpa.JpaUnit;
 import org.seedstack.seed.spi.command.Command;
 import org.seedstack.seed.spi.command.CommandDefinition;
 import org.seedstack.seed.spi.command.Option;
+import org.seedstack.seed.transaction.Transactional;
 import org.ydautremay.ouist.application.Session;
 import org.ydautremay.ouist.domain.model.game.Game;
 import org.ydautremay.ouist.domain.model.game.GameState;
@@ -30,6 +32,8 @@ public class CancelBetCommand implements Command<String> {
     private Repository<Game, UUID> gameRepository;
 
     @Override
+    @Transactional
+    @JpaUnit("ouist-jpa-unit")
     public String execute(Object object) throws Exception {
         UUID gameId = session.getCurrentGameId();
         if(gameId == null){
