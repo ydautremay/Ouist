@@ -13,7 +13,7 @@ import org.ydautremay.ouist.application.ApplicationStatusMonitor;
 /**
  * Created by dautremayy on 03/02/2016.
  */
-@CliCommand("dummy")
+@CliCommand("application-loop")
 public class CommandLineHandlerImpl implements CommandLineHandler {
 
     @Logging

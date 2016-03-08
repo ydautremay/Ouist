@@ -3,7 +3,7 @@ enabled = true
 key.type = generated
 
 [org.seedstack.seed.cli]
-default-command = dummy
+default-command = application-loop
 
 [org.seedstack.seed.security.users]
 yves = pass
