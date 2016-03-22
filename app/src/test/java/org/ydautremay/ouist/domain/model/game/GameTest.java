@@ -6,8 +6,6 @@ import java.util.UUID;
 
 import org.junit.Test;
 import org.mockito.internal.util.reflection.Whitebox;
-import org.ydautremay.ouist.domain.model.game.exceptions.GameActionException;
-import org.ydautremay.ouist.domain.model.game.exceptions.GameStateChangeException;
 import org.ydautremay.ouist.domain.model.player.PlayerNickName;
 
 /**
@@ -50,23 +48,45 @@ public class GameTest {
         assertThat(underTest.getCurrentRound().getDealer()).isEqualTo(player1);
 
         gameState = underTest.nextContract(0);
+        assertThat(gameState).isEqualTo( GameState.BETTING);
+        gameState = underTest.cancelContract();
         assertThat(gameState).isEqualTo( GameState.READY);
         gameState = underTest.nextContract(0);
-        assertThat(gameState).isEqualTo( GameState.READY);
+        assertThat(gameState).isEqualTo( GameState.BETTING);
+        gameState = underTest.nextContract(0);
+        assertThat(gameState).isEqualTo( GameState.BETTING);
         gameState = underTest.nextContract(0);
         assertThat(gameState).isEqualTo( GameState.LAST_BET);
         gameState = underTest.nextContract(0);
-        assertThat(gameState).isEqualTo( GameState.BETS_DONE);
+        assertThat(gameState).isEqualTo( GameState.FIRST_PLAY);
         assertThat(underTest.getRounds()).hasSize(1);
+        gameState = underTest.cancelContract();
+        assertThat(gameState).isEqualTo( GameState.LAST_BET);
+        gameState = underTest.nextContract(0);
+        assertThat(gameState).isEqualTo( GameState.FIRST_PLAY);
 
         gameState = underTest.nextTrick(player1);
-        assertThat(gameState).isEqualTo( GameState.BETS_DONE);
-        gameState = underTest.nextTrick(player2);
-        assertThat(gameState).isEqualTo( GameState.BETS_DONE);
+        assertThat(gameState).isEqualTo( GameState.PLAYING);
+        gameState = underTest.cancelPlay();
+        assertThat(gameState).isEqualTo( GameState.FIRST_PLAY);
         gameState = underTest.nextTrick(player1);
-        assertThat(gameState).isEqualTo( GameState.BETS_DONE);
+        assertThat(gameState).isEqualTo( GameState.PLAYING);
+        gameState = underTest.nextTrick(player2);
+        assertThat(gameState).isEqualTo( GameState.PLAYING);
+        gameState = underTest.cancelPlay();
+        assertThat(gameState).isEqualTo( GameState.PLAYING);
+        gameState = underTest.nextTrick(player2);
+        assertThat(gameState).isEqualTo( GameState.PLAYING);
+        gameState = underTest.nextTrick(player1);
+        assertThat(gameState).isEqualTo( GameState.PLAYING);
         gameState =  underTest.nextTrick(player3);
-        assertThat(gameState).isEqualTo( GameState.BETS_DONE);
+        assertThat(gameState).isEqualTo( GameState.PLAYING);
+        gameState = underTest.nextTrick(player4);
+        assertThat(gameState).isEqualTo( GameState.READY);
+        assertThat(underTest.getRounds()).hasSize(2);
+        gameState = underTest.cancelPlay();
+        assertThat(gameState).isEqualTo( GameState.PLAYING);
+        assertThat(underTest.getRounds()).hasSize(1);
         gameState = underTest.nextTrick(player4);
         assertThat(gameState).isEqualTo( GameState.READY);
         assertThat(underTest.getRounds()).hasSize(2);
@@ -78,13 +98,13 @@ public class GameTest {
         assertThat(underTest.getCurrentRound().getDealer()).isEqualTo(player2);
 
         gameState = underTest.nextContract(0);
-        assertThat(gameState).isEqualTo( GameState.READY);
+        assertThat(gameState).isEqualTo( GameState.BETTING);
         gameState = underTest.nextContract(0);
-        assertThat(gameState).isEqualTo( GameState.READY);
+        assertThat(gameState).isEqualTo( GameState.BETTING);
         gameState = underTest.nextContract(0);
         assertThat(gameState).isEqualTo( GameState.LAST_BET);
         gameState = underTest.nextContract(0);
-        assertThat(gameState).isEqualTo( GameState.BETS_DONE);
+        assertThat(gameState).isEqualTo( GameState.FIRST_PLAY);
 
         gameState = underTest.nextTrick(player1);
         assertThat(gameState).isEqualTo( GameState.READY);
@@ -95,87 +115,6 @@ public class GameTest {
 
         gameState = underTest.finish();
         assertThat(gameState).isEqualTo(GameState.FINISHED);
-    }
-
-    @Test(expected = GameActionException.class)
-    public void addPlayer_throws_exception_in_wrong_state() throws GameActionException {
-        Game underTest = new Game();
-        Whitebox.setInternalState(underTest, "gameId", UUID.randomUUID());
-        Whitebox.setInternalState(underTest, "gameState", GameState.READY);
-        underTest.addPlayer(new PlayerNickName("player"));
-    }
-
-    @Test(expected = GameActionException.class)
-    public void removePlayer_throws_exception_in_wrong_state() throws GameActionException {
-        Game underTest = new Game();
-        Whitebox.setInternalState(underTest, "gameId", UUID.randomUUID());
-        underTest.addPlayer(new PlayerNickName("player"));
-        Whitebox.setInternalState(underTest, "gameState", GameState.READY);
-        underTest.removePlayer(new PlayerNickName("player"));
-    }
-
-    @Test(expected = GameActionException.class)
-    public void nextContract_throws_exception_in_wrong_state()
-            throws GameActionException, GameStateChangeException {
-        Game underTest = new Game();
-        Whitebox.setInternalState(underTest, "gameId", UUID.randomUUID());
-        underTest.nextContract(0);
-    }
-
-    @Test(expected = GameActionException.class)
-    public void nextContract_throws_exception_in_wrong_state2()
-            throws GameActionException, GameStateChangeException {
-        Game underTest = new Game();
-        Whitebox.setInternalState(underTest, "gameId", UUID.randomUUID());
-        underTest.addPlayer(new PlayerNickName("player"));
-        underTest.addPlayer(new PlayerNickName("player2"));
-        underTest.startGame();
-        underTest.nextContract(0);
-        underTest.nextContract(0);
-        underTest.nextContract(0);
-    }
-
-    @Test(expected = GameActionException.class)
-    public void nextContract_throws_exception_if_last_bet_equals_nb_tricks()
-            throws GameActionException, GameStateChangeException {
-        Game underTest = new Game();
-        Whitebox.setInternalState(underTest, "gameId", UUID.randomUUID());
-        underTest.addPlayer(new PlayerNickName("player"));
-        underTest.startGame();
-        underTest.nextContract(22);
-    }
-
-    @Test(expected = GameActionException.class)
-    public void nextTrick_throws_exception_in_wrong_state()
-            throws GameActionException, GameStateChangeException {
-        Game underTest = new Game();
-        Whitebox.setInternalState(underTest, "gameId", UUID.randomUUID());
-        underTest.nextTrick(new PlayerNickName(""));
-    }
-
-    @Test(expected = GameActionException.class)
-    public void nextTrick_throws_exception_in_wrong_state2()
-            throws GameActionException, GameStateChangeException {
-        Game underTest = new Game();
-        Whitebox.setInternalState(underTest, "gameId", UUID.randomUUID());
-        underTest.addPlayer(new PlayerNickName("player"));
-        underTest.addPlayer(new PlayerNickName("player2"));
-        underTest.startGame();
-        underTest.nextContract(0);
-        underTest.nextContract(1);
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
-        underTest.nextTrick(new PlayerNickName("player"));
     }
 
 }

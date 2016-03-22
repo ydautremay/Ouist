@@ -1,11 +1,13 @@
 package org.ydautremay.ouist.domain.model.game;
 
 import org.ydautremay.ouist.domain.model.game.exceptions.GameStateChangeException;
-import org.ydautremay.ouist.domain.model.game.state.BetsDoneGso;
+import org.ydautremay.ouist.domain.model.game.state.BettingGso;
 import org.ydautremay.ouist.domain.model.game.state.FinishedGso;
+import org.ydautremay.ouist.domain.model.game.state.FirstPlayGso;
 import org.ydautremay.ouist.domain.model.game.state.GameStateOperations;
 import org.ydautremay.ouist.domain.model.game.state.LastBetGso;
 import org.ydautremay.ouist.domain.model.game.state.NewGso;
+import org.ydautremay.ouist.domain.model.game.state.PlayingGso;
 import org.ydautremay.ouist.domain.model.game.state.ReadyGso;
 
 /**
@@ -14,8 +16,10 @@ import org.ydautremay.ouist.domain.model.game.state.ReadyGso;
 public enum GameState implements GameStateOperations {
     NEW(new NewGso()),
     READY(new ReadyGso()),
+    BETTING(new BettingGso()),
     LAST_BET(new LastBetGso()),
-    BETS_DONE(new BetsDoneGso()),
+    FIRST_PLAY(new FirstPlayGso()),
+    PLAYING(new PlayingGso()),
     FINISHED(new FinishedGso());
 
     private final GameStateOperations operations;
@@ -30,23 +34,27 @@ public enum GameState implements GameStateOperations {
     }
 
     @Override
-    public GameState lastBet(Game game) throws GameStateChangeException{
-        return operations.lastBet(game);
+    public GameState bet(Game game) throws GameStateChangeException {
+        return operations.bet(game);
     }
 
     @Override
-    public GameState betsDone(Game game) throws GameStateChangeException{
-        return operations.betsDone(game);
+    public GameState cancelBet(Game game) throws GameStateChangeException {
+        return operations.cancelBet(game);
     }
 
     @Override
-    public GameState dealPlayed(Game game) throws GameStateChangeException{
-        return operations.dealPlayed(game);
+    public GameState play(Game game) throws GameStateChangeException {
+        return operations.play(game);
     }
 
     @Override
-    public GameState finish(Game game) throws GameStateChangeException{
+    public GameState cancelPlay(Game game) throws GameStateChangeException {
+        return operations.cancelPlay(game);
+    }
+
+    @Override
+    public GameState finish(Game game) throws GameStateChangeException {
         return operations.finish(game);
     }
-
 }

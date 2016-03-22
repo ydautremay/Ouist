@@ -13,13 +13,13 @@ import org.ydautremay.ouist.domain.model.game.exceptions.GameStateChangeExceptio
  */
 public class BetsDoneGsoTest {
 
-    private GameStateOperations gso = new BetsDoneGso();
+    private GameStateOperations gso = new FirstPlayGso();
 
     private Game game = Mockito.mock(Game.class);
 
     @Test(expected = GameStateChangeException.class)
     public void bets_done() throws GameStateChangeException {
-        gso.betsDone(game);
+        gso.ready(game);
     }
 
     @Test(expected = GameStateChangeException.class)
@@ -29,7 +29,7 @@ public class BetsDoneGsoTest {
 
     @Test
     public void deal_played() throws GameStateChangeException {
-        assertThat(gso.dealPlayed(game)).isEqualTo(GameState.READY);
+        assertThat(gso.finish(game)).isEqualTo(GameState.READY);
     }
 
     @Test(expected = GameStateChangeException.class)

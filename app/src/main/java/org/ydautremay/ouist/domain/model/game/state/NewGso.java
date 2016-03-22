@@ -12,24 +12,29 @@ public class NewGso implements GameStateOperations {
 
     @Override
     public GameState ready(Game game) throws GameStateChangeException {
-        if(game.getChairs().isEmpty()){
-            throw new CannotStartGameException("Cannot start a game with no players");
+        if(game.getChairs().size() <= 1){
+            throw new CannotStartGameException("Cannot start a game with one or no players");
         }
         return GameState.READY;
     }
 
     @Override
-    public GameState lastBet(Game game) throws GameStateChangeException {
+    public GameState bet(Game game) throws GameStateChangeException {
         throw new GameStateChangeException();
     }
 
     @Override
-    public GameState betsDone(Game game) throws GameStateChangeException {
+    public GameState cancelBet(Game game) throws GameStateChangeException {
         throw new GameStateChangeException();
     }
 
     @Override
-    public GameState dealPlayed(Game game) throws GameStateChangeException {
+    public GameState play(Game game) throws GameStateChangeException {
+        throw new GameStateChangeException();
+    }
+
+    @Override
+    public GameState cancelPlay(Game game) throws GameStateChangeException {
         throw new GameStateChangeException();
     }
 

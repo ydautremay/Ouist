@@ -34,7 +34,7 @@ public class NewGsoTest {
 
     @Test(expected = GameStateChangeException.class)
     public void bets_done() throws GameStateChangeException {
-        gso.betsDone(game);
+        gso.play(game);
     }
 
     @Test(expected = GameStateChangeException.class)
@@ -44,7 +44,7 @@ public class NewGsoTest {
 
     @Test(expected = GameStateChangeException.class)
     public void deal_played() throws GameStateChangeException {
-        gso.dealPlayed(game);
+        gso.play(game);
     }
 
     @Test

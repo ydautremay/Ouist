@@ -11,13 +11,13 @@ import org.seedstack.seed.Logging;
 import org.seedstack.seed.spi.command.Command;
 import org.seedstack.seed.spi.command.CommandDefinition;
 import org.seedstack.seed.spi.command.Option;
-
 import org.seedstack.seed.transaction.Transactional;
 import org.slf4j.Logger;
 import org.ydautremay.ouist.application.Session;
 import org.ydautremay.ouist.domain.model.game.Chair;
 import org.ydautremay.ouist.domain.model.game.Game;
 import org.ydautremay.ouist.domain.model.game.GameFactory;
+import org.ydautremay.ouist.domain.model.game.GameState;
 import org.ydautremay.ouist.domain.model.player.PlayerNickName;
 import org.ydautremay.ouist.domain.model.scoresheet.ScoreSheet;
 import org.ydautremay.ouist.domain.model.scoresheet.ScoreSheetFactory;
@@ -115,8 +115,23 @@ public class GameCommand implements Command<String> {
                 toReturn += "First player to bet : " + game.getPlayerToBet(game.getCurrentRound()) + "\n";
             }
             if (describe) {
+                toReturn += "players :\n";
                 for (Chair chair : game.getChairs()) {
                     toReturn += chair.getPlayer().getNickname() + " ";
+                }
+                toReturn += "\n";
+                GameState state = game.getGameState();
+                if(state == GameState.READY || state == GameState.BETTING || state == GameState.LAST_BET){
+                    toReturn += "Dealer is " + game.getCurrentRound().getDealer() + "\n";
+                    toReturn += "Player to bet : " + game.getPlayerToBet(game.getCurrentRound()) + "\n";
+                }else if(state == GameState.FIRST_PLAY || state == GameState.PLAYING){
+                    toReturn += "Dealer is " + game.getCurrentRound().getDealer() + "\n";
+                    toReturn += "Playing trinck nb " + game.getCurrentRound().getPlayedTricks().size() + " "
+                            + "out of " + game.getCurrentTrickAmount();
+                }else if(state == GameState.NEW){
+                    toReturn += "Game has not started\n";
+                }else{
+                    toReturn += "Game is finished";
                 }
             }
             if(finish){

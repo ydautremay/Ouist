@@ -1,6 +1,10 @@
 package org.ydautremay.ouist.commands;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -50,55 +54,56 @@ public class PlayCommand implements Command<String> {
     @Inject
     private ScoreService scoreService;
 
+    @Override
     @Transactional
     @JpaUnit("ouist-jpa-unit")
     public String execute(Object object) throws Exception {
+        UUID gameId = session.getCurrentGameId();
+        if (gameId == null) {
+            return "You need to join a game. Please use the join command";
+        }
+        Game game = gameRepository.load(gameId);
+        if (game == null) {
+            return "The game you joined does not exist anymore";
+        }
+        GameState state;
         try {
-            UUID gameId = session.getCurrentGameId();
-            if (gameId == null) {
-                return "You need to join a game. Please use the join command";
+            state = game.nextTrick(new PlayerNickName(leader));
+        }
+        catch (GameActionException e) {
+            return "Player " + leader + " is not playing at this table";
+        }
+        gameRepository.save(game);
+        if (state == GameState.READY) {
+            ScoreSheet scoreSheet = scoreSheetRepository.load(game.getScoreSheetId());
+            Round lastRound = game.getLastRound();
+            scoreService.computeScores(scoreSheet, lastRound);
+            scoreSheetRepository.save(scoreSheet);
+            String toReturn = "Round over !\n";
+            for (Chair chair : game.getChairs()) {
+                PlayerNickName player = chair.getPlayer();
+                Score score = getScore(scoreSheet, lastRound, player);
+                toReturn += player + " : " + score.getValue() + "\n";
             }
-            Game game = gameRepository.load(gameId);
-            if (game == null) {
-                return "The game you joined does not exist anymore";
+            toReturn += "\n";
+            toReturn += "Game totals \n";
+            List<Score> totals = new ArrayList<>();
+            for (Chair chair : game.getChairs()) {
+                PlayerNickName player = chair.getPlayer();
+                int total = scoreSheet.getTotal(player);
+                totals.add(new Score(player, total));
             }
-            GameState state;
-            try {
-                state = game.nextTrick(new PlayerNickName(leader));
-                gameRepository.save(game);
+            Collections.sort(totals, new ScoreComparator());
+            for (Score score:totals) {
+                toReturn += score.getPlayer() + " : " + score.getValue() + "\n";
             }
-            catch (GameActionException e) {
-                return "Player " + leader + " is not playing at this table";
-            }
-            if (state == GameState.READY) {
-                ScoreSheet scoreSheet = scoreSheetRepository.load(game.getScoreSheetId());
-                Round lastRound = game.getLastRound();
-                scoreService.computeScores(scoreSheet, lastRound);
-                scoreSheetRepository.save(scoreSheet);
-                String toReturn = "Round over !\n";
-                for (Chair chair : game.getChairs()) {
-                    PlayerNickName player = chair.getPlayer();
-                    Score score = getScore(scoreSheet, lastRound, player);
-                    toReturn += player + " : " + score.getValue() + "\n";
-                }
-                toReturn += "\n";
-                toReturn += "Game totals \n";
-                for (Chair chair : game.getChairs()) {
-                    PlayerNickName player = chair.getPlayer();
-                    int total = scoreSheet.getTotal(player);
-                    toReturn += player + " : " + total + "\n";
-                }
-                toReturn += "New Round\n";
-                toReturn += game.getCurrentRound().getDealer() + " : please deal " + game.getCurrentTrickAmount
-                        () + " cards to each player\n";
-                toReturn += "First player to bet : " + game.getPlayerToBet(game.getCurrentRound()) + "\n";
-                return toReturn;
-            } else {
-                return leader + " takes the trick.";
-            }
-        }catch(Exception e){
-            logger.error("OMG !!", e);
-            throw e;
+            toReturn += "New Round\n";
+            toReturn += game.getCurrentRound().getDealer() + " : please deal " + game.getCurrentTrickAmount
+                    () + " cards to each player\n";
+            toReturn += "First player to bet : " + game.getPlayerToBet(game.getCurrentRound()) + "\n";
+            return toReturn;
+        } else {
+            return leader + " takes the trick.";
         }
     }
 
@@ -112,5 +117,13 @@ public class PlayCommand implements Command<String> {
             }
         }
         return null;
+    }
+
+    private static class ScoreComparator implements Comparator<Score>{
+
+        @Override
+        public int compare(Score o1, Score o2) {
+            return ((Integer)o1.getValue()).compareTo(o2.getValue());
+        }
     }
 }

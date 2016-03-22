@@ -11,11 +11,13 @@ public interface GameStateOperations {
 
     GameState ready(Game game) throws GameStateChangeException;
 
-    GameState lastBet(Game game) throws GameStateChangeException;
+    GameState bet(Game game) throws GameStateChangeException;
 
-    GameState betsDone(Game game) throws GameStateChangeException;
+    GameState cancelBet(Game game) throws GameStateChangeException;
 
-    GameState dealPlayed(Game game) throws GameStateChangeException;
+    GameState play(Game game) throws GameStateChangeException;
+
+    GameState cancelPlay(Game game) throws GameStateChangeException;
 
     GameState finish(Game game) throws GameStateChangeException;
 }
