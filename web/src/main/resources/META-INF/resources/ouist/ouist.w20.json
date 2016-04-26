@@ -1,0 +1,29 @@
+{
+  "id": "ouist",
+  "name": "ouist game",
+  "modules": {
+    "games": {
+      "path": "{ouist}/modules/games",
+      "autoload": true,
+      "config": {
+        "apiUrl": "${seed-rest-path-slash}"
+      }
+    },
+    "games-style": {
+      "path": "[css]!{ouist}/style/games.css",
+      "autoload": true
+    }
+  },
+  "i18n": {
+    "en": [ "{ouist}/i18n/messages-en.json" ],
+    "fr": [ "{ouist}/i18n/messages-en.json" ]
+  },
+
+  "routes": {
+    "games": {
+      "templateUrl": "{ouist}/views/games.html",
+      "controller": "GameController",
+      "category": "Ouist"
+    }
+  }
+}

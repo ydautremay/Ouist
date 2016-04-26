@@ -1,6 +1,7 @@
 package org.ydautremay.ouist.domain.model.game;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,6 +34,8 @@ public class Game extends BaseAggregateRoot<UUID> {
     @Id
     @Identity(handler = UUIDHandler.class)
     private UUID gameId;
+
+    private Date date = new Date();
 
     @OneToMany(mappedBy = "roundId.gameId", cascade = CascadeType.ALL)
     @OrderBy("roundNb")
@@ -287,5 +290,9 @@ public class Game extends BaseAggregateRoot<UUID> {
 
     public void setScoreSheetId(UUID scoreSheetId) {
         this.scoreSheetId = scoreSheetId;
+    }
+
+    public Date getDate() {
+        return date;
     }
 }
