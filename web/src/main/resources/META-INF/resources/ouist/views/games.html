@@ -10,27 +10,34 @@
                 <div data-ng-class="{'active-game': game === activeGame}" class="game-box"
                      data-ng-click="setActiveGame(game)" data-ng-repeat="game in paginatedGames">
                     <div class="row">
-                        <div class="col-xs-2">
-                            <strong> Date </strong> {{ game.date | date:'dd/MM/yyyy HH:mm' }}
-                        </div>
-                        <div class="col-md-9">
-                            <ul class="list-inline pull-right">
-                                <li><button data-ng-click="deleteGame(game)"
-                                            class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Delete
-                                </button></li>
-                            </ul>
-                            <div>
-                            <span>
-                                <strong> Id </strong> {{ game.gameId }}
-                            </span>
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <strong> Date </strong> {{ game.date | date:'dd/MM/yyyy HH:mm' }}
+                            </div>
+                            <div class="col-md-4">
+                                <div class="col-md-4">
+                                    <strong> Players </strong>
+                                </div>
+                                <div class="col-md-10">
+                                    <ul class="list-group">
+                                        <li class="list-group-item-text" data-ng-repeat="player in game.players">{{ player }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <a href="play" class="btn btn-primary btn-sm" role="button">
+                                    <i class="fa fa-play">Play</i>
+                                </a>
+                            </div>
+                            <div class="col-md-1">
+                                <button data-ng-click="deleteGame(game)" class="btn btn-danger btn-sm">
+                                    <i class="fa fa-trash">Delete</i>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="store-pager game-product-pager" data-ng-show="paginatedProducts.length">
-            <div data-pagination data-ng-model="pagingProducts.currentPage" data-items-per-page="pagingProducts.pageSize" data-total-items="pagingProducts.totalServerItems" data-ng-change="pageProductChanged()" data-max-size="5" class="pagination-sm" data-boundary-links="true" data-rotate="false"></div>
         </div>
     </div>
 </div>
@@ -39,9 +46,22 @@
     <div class="modal-header">
         <h3 class="modal-title"> {{ modalTitle }} </h3>
     </div>
+    <div class="modal-body">
+        Players :
+        <form class="form-horizontal">
+            <div class="form-group" data-ng-repeat="player in players track by $index" data-ng->
+                <input type="text" data-ng-model="players[$index]"/>
+                <button class="btn btn-danger btn-sm" data-ng-click="remove(player)"><span class="fa fa-trash">Remove></span></button>
+            </div>
+            <div class="form-group">
+                <input type="text" data-ng-model="newPlayer"/>
+                <button class="btn btn-sm" data-ng-click="add()"><span class="fa fa-plus">Add</span></button>
+            </div>
+        </form>
+    </div>
     <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="ok()">OK</button>
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" data-ng-click="ok()">OK</button>
+        <button class="btn btn-warning" data-ng-click="cancel()">Cancel</button>
     </div>
 </script>
 <!-- Modal to delete a game -->
@@ -53,7 +73,7 @@
         Delete game {{ game.name }} ?
     </div>
     <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="ok()">OK</button>
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" data-ng-click="ok()">OK</button>
+        <button class="btn btn-warning" data-ng-click="cancel()">Cancel</button>
     </div>
 </script>

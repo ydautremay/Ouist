@@ -4,6 +4,6 @@
 
     <root level="INFO">
         <!-- Switch to STDOUT if color output is not supported -->
-        <appender-ref ref="STDOUT-COLOR" />
+        <appender-ref ref="STDOUT" />
     </root>
 </configuration>

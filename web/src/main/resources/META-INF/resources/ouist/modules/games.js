@@ -13,7 +13,7 @@ define([
 
     gameManagement.factory('GameService', ['$resource', function ($resource) {
         var Game = $resource(require.toUrl(config.apiUrl + 'games/:gameId'), {gameId: '@id'}, {
-            'update': {method: 'PUT'}
+            'save': {method: 'POST'}
         });
 
         return {
@@ -29,29 +29,43 @@ define([
                 return Game.get({gameId: id});
             },
 
-            deleteGame: function (game, success, error) {
-                game.$delete(success, error);
-            },
-
-            updateGame: function (game, success, error) {
-                game.$update(success, error);
-            },
-
-            addGame: function (game, success, error) {
+            addGame: function (players, success, error) {
                 var newGame = new Game();
-
-                newGame.name = game.name;
-
+                newGame.players = players;
                 newGame.$save(success, error);
+            },
+
+            deleteGame: function(game, success, error) {
+                Game.delete({gameId: game.gameId}, success, error);
             }
         };
     }]);
 
-    gameManagement.controller('ModalGameController', ['$scope', '$modalInstance', 'game', 'modalTitle', function ($scope, $modalInstance, game, modalTitle) {
+    gameManagement.controller('ModalGameController', ['$scope', '$modalInstance', 'modalTitle', function ($scope, $modalInstance, modalTitle) {
+        $scope.modalTitle = modalTitle;
+        $scope.players = new Array();
+        $scope.newPlayer = "";
+        $scope.ok = function () {
+            $modalInstance.close($scope.players);
+        };
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+        $scope.add = function() {
+            $scope.players.push($scope.newPlayer);
+            $scope.newPlayer = "";
+        };
+        $scope.remove = function(player) {
+            var index = $scope.players.indexOf(player);
+            $scope.players.splice(index, 1);
+        };
+    }]);
+
+    gameManagement.controller('ModalDeleteGameController', ['$scope', '$modalInstance', 'game', 'modalTitle', function ($scope, $modalInstance, game, modalTitle) {
         $scope.modalTitle = modalTitle;
         $scope.game = game;
         $scope.ok = function () {
-            $modalInstance.close($scope.game);
+            $modalInstance.close(game);
         };
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
@@ -74,10 +88,10 @@ define([
 
         function getGamesSuccess(data){
             $scope.paginatedGames = data;
-            $scope.pagingGames.totalServerItems = $scope.paginatedGames.$viewInfo.resultSize;
-            if ($scope.paginatedGames.length) {
-                $scope.activeGame = $scope.paginatedGames[0];
-            }
+            //$scope.pagingGames.totalServerItems = $scope.paginatedGames.$viewInfo.resultSize;
+            //if ($scope.paginatedGames.length) {
+            //    $scope.activeGame = $scope.paginatedGames[0];
+            //}
         }
 
         function getGamesError(err) {
@@ -85,7 +99,7 @@ define([
         }
 
         function getGames() {
-            gameService.allPaginatedGames($scope.pagingGames.currentPage, $scope.pagingGames.pageSize, getGamesSuccess, getGamesError);
+            gameService.allGames(getGamesSuccess, getGamesError);
         }
 
         $scope.pagingGames = {
@@ -103,8 +117,8 @@ define([
         };
 
         $scope.createNewGame = function() {
-            modal('Add a game', 'modalGame.html', 'ModalGameController', {}, function(newGame) {
-                gameService.addGame(newGame,
+            modal('Add a game', 'modalGame.html', 'ModalGameController', {}, function(players) {
+                gameService.addGame(players,
                     function() {
                         getGames();
                     },
@@ -114,20 +128,8 @@ define([
             });
         };
 
-        $scope.editGame = function(game) {
-            modal('Edit game', 'modalGame.html', 'ModalGameController', game, function (game) {
-                gameService.updateGame(game,
-                    function () {
-                        getGames();
-                    },
-                    function (err) {
-                        throw new Error('Could not update game ' + err.message);
-                    });
-            });
-        };
-
         $scope.deleteGame = function(game) {
-            modal('Delete a game', 'modalConfirmGame.html', 'ModalGameController', game, function (game) {
+            modal('Delete a game', 'modalConfirmGame.html', 'ModalDeleteGameController', game, function (game) {
                 gameService.deleteGame(game,
                     function() {
                         getGames();

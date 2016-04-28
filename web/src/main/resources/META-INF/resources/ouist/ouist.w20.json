@@ -24,6 +24,10 @@
       "templateUrl": "{ouist}/views/games.html",
       "controller": "GameController",
       "category": "Ouist"
+    },
+    "play": {
+      "templateUrl": "{ouist}/views/play.html",
+      "controller": "PlayController"
     }
   }
 }
