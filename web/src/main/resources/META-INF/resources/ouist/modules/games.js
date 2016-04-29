@@ -54,6 +54,7 @@ define([
         $scope.add = function() {
             $scope.players.push($scope.newPlayer);
             $scope.newPlayer = "";
+            document.querySelector("#newPlayer").focus();
         };
         $scope.remove = function(player) {
             var index = $scope.players.indexOf(player);
@@ -74,16 +75,47 @@ define([
 
     gameManagement.controller('GameController', ['$scope', '$modal', '$timeout', 'GameService', function ($scope, $modal, $timeout, gameService) {
 
-        function modal(title, template, controller, game, callback) {
+        function modal(title, template) {
             var modalInstance = $modal.open({
                 templateUrl: template,
-                controller: controller,
+                controller: 'ModalGameController',
+                resolve: {
+                    modalTitle: function() { return title; }
+                }
+            });
+            modalInstance.result.then(function(players) {
+                gameService.addGame(players,
+                    function() {
+                        getGames();
+                    },
+                    function(err) {
+                        throw new Error('Could not add new game ' + err.message);
+                    }
+                );
+            });
+            modalInstance.rendered.then(function(){
+                document.querySelector("#newPlayer").focus();
+            });
+        }
+
+        function deleteModal(title, template, game) {
+            var modalInstance = $modal.open({
+                templateUrl: template,
+                controller: 'ModalDeleteGameController',
                 resolve: {
                     game: function () { return game; },
                     modalTitle: function() { return title; }
                 }
             });
-            modalInstance.result.then(function(data) { callback(data); });
+            modalInstance.result.then(function (game) {
+                gameService.deleteGame(game,
+                    function() {
+                        getGames();
+                    },
+                    function(err) {
+                        throw new Error('Could not delete game ' + err.message);
+                    });
+            });
         }
 
         function getGamesSuccess(data){
@@ -117,27 +149,11 @@ define([
         };
 
         $scope.createNewGame = function() {
-            modal('Add a game', 'modalGame.html', 'ModalGameController', {}, function(players) {
-                gameService.addGame(players,
-                    function() {
-                        getGames();
-                    },
-                    function(err) {
-                        throw new Error('Could not add new game ' + err.message);
-                    });
-            });
+            modal('Add a game', 'modalGame.html');
         };
 
         $scope.deleteGame = function(game) {
-            modal('Delete a game', 'modalConfirmGame.html', 'ModalDeleteGameController', game, function (game) {
-                gameService.deleteGame(game,
-                    function() {
-                        getGames();
-                    },
-                    function(err) {
-                        throw new Error('Could not delete game ' + err.message);
-                    });
-            });
+            deleteModal('Delete a game', 'modalConfirmGame.html', game);
         };
 
         getGames();

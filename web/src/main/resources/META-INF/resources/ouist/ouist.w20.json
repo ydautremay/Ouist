@@ -27,7 +27,8 @@
     },
     "play": {
       "templateUrl": "{ouist}/views/play.html",
-      "controller": "PlayController"
+      "controller": "PlayController",
+      "hidden": true
     }
   }
 }

@@ -48,14 +48,15 @@
     </div>
     <div class="modal-body">
         Players :
-        <form class="form-horizontal">
-            <div class="form-group" data-ng-repeat="player in players track by $index" data-ng->
-                <input type="text" data-ng-model="players[$index]"/>
-                <button class="btn btn-danger btn-sm" data-ng-click="remove(player)"><span class="fa fa-trash">Remove></span></button>
-            </div>
+        <div class="form-group" data-ng-repeat="player in players track by $index">
+            <input type="text" data-ng-model="players[$index]"/>
+            <button class="btn btn-danger btn-sm" data-ng-click="remove(player)"><span class="fa fa-trash">Remove></span></button>
+        </div>
+        <form>
             <div class="form-group">
-                <input type="text" data-ng-model="newPlayer"/>
-                <button class="btn btn-sm" data-ng-click="add()"><span class="fa fa-plus">Add</span></button>
+                <input id="newPlayer" type="text" data-ng-model="newPlayer"/>
+                <button type="submit" id="addPlayer" class="btn btn-sm btn-primary"
+                        data-ng-click="add()"><span class="fa fa-plus">Add</span></button>
             </div>
         </form>
     </div>
